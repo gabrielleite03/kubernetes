@@ -1,0 +1,207 @@
+A docker image está disponível aqui https://hub.docker.com/repository/docker/leandrocgsi/hello-kubernetes/general
+E o código fonte dela (em diferentes linguagens) aqui https://github.com/leandrocgsi/hello-kubernetes
+
+docker run -p 8080:8080 leandrocgsi/hello-kubernetes:erudio-0.0.1
+
+https://hub.docker.com/layers/leandrocgsi/hello-kubernetes/erudio-0.0.1/images/sha256-125c8f779730cf3b58f4ae9c7d4dd5b8b5a08ca0855d5dcabd6ac3522f2a3251?context=repo
+
+http://localhost:8080/hello-kubernetes
+
+Antes de executar o comando abaixo apague o contêiner iniciado pelo comando acima ou a porta 8080 estará alocada causando erro.
+
+kubectl create deployment hello-kubernetes --image=leandrocgsi/hello-kubernetes:erudio-0.0.1
+kubectl expose deployment hello-kubernetes --type=LoadBalancer --port=8080
+
+http://localhost:8080/hello-kubernetes
+ 
+kubectl scale deployment hello-kubernetes --replicas=3
+kubectl get pods -o wide
+kubectl delete pod hello-kubernetes-d68b65f76-tfn4w
+kubectl get pods -o wide
+kubectl autoscale deployment hello-kubernetes --max=10 --cpu-percent=70
+kubectl edit deployment hello-kubernetes
+
+Edite o arquivo YML (não use TABS) adicionando a propriedade #minReadySeconds: 15
+
+
+Adicionar a seguinte informação para definir o tempo minimo para subir a nova imagem
+spec:
+  minReadySeconds: 15
+  progressDeadlineSeconds: 600
+  replicas: 3
+
+https://hub.docker.com/layers/leandrocgsi/hello-kubernetes/erudio-0.0.2/images/sha256-64d8fb2a409d610ea258aee7423faddacc39e5df64cc27b9807a7b23037ba3ab?context=repo
+
+kubectl set image deployment hello-kubernetes hello-kubernetes=leandrocgsi/hello-kubernetes:erudio-0.0.2
+
+
+
+kubectl get events
+kubectl get pods
+kubectl get replicaset
+kubectl get deployment
+kubectl get service
+
+
+kubectl get pods -o wide   // mostra a lista de pods no cluster
+kubectl explain pods
+kubectl get pods
+kubectl describe pod hello-kubernetes-5df8fb76f9-25jkc  // mostra todos os detalhes do pod
+
+
+kubectl get replicasets
+kubectl get rs
+
+kubectl get pods -o wide
+kubectl delete pod hello-kubernetes-5df8fb76f9-rxqs9
+kubectl get pods -o wide
+kubectl get rs
+
+kubectl scale deployment hello-kubernetes --replicas=3
+kubectl get pods
+kubectl get pods -o wide
+kubectl get replicaset
+kubectl get events
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+kubectl get replicasets
+ou
+kubectl get rs
+
+kubectl get replicaset -o wide
+kubectl set image deployment hello-kubernetes hello-kubernetes=FOO_BAR:TEST
+kubectl get replicaset -o wide
+kubectl get pods
+kubectl describe pod hello-kubernetes-66cbdfb555-hxvw2
+kubectl get events --sort-by=.metadata.creationTimestamp
+kubectl set image deployment hello-kubernetes hello-kubernetes=leandrocgsi/hello-kubernetes:erudio-0.0.2
+
+https://hub.docker.com/layers/leandrocgsi/hello-kubernetes/erudio-0.0.2/images/sha256-64d8fb2a409d610ea258aee7423faddacc39e5df64cc27b9807a7b23037ba3ab?context=repo
+
+kubectl get pods
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+kubectl get pods -o wide
+kubectl delete pod hello-kubernetes-5df8fb76f9-6jp4l
+kubectl get pods -o wide
+
+kubectl expose deployment hello-kubernetes --type=LoadBalancer --port=8080 (esse comando criou o service de forma transparente pra nós)
+
+kubectl get services
+
+
+# monitoramento
+kubectl get componentstatuses
+kubectl get cs
+
+https://pet2cattle.com/2022/09/kubectl-get-componentstatuses
+https://www.reddit.com/r/kubernetes/comments/rxijec/whats_the_replacement_for_kubectl_get_cs/
+https://stackoverflow.com/questions/73407661/componentstatus-is-deprecated-what-to-use-then
+
+kubectl get --raw='/readyz?verbose'
+kubectl get --raw='/livez?verbose'
+kubectl get --raw '/healthz'
+kubectl get --raw '/readyz'
+
+https://localhost:6443/
+
+https://localhost:6443/livez?verbose
+https://localhost:6443/healthz?verbose
+https://localhost:6443/readyz?verbose
+
+
+
+# dashboard
+
+https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
+https://github.com/kubernetes/dashboard
+
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+
+kubectl create serviceaccount admin-user -n kubernetes-dashboard
+
+kubectl create clusterrolebinding admin-user-binding --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:admin-user
+
+kubectl -n kubernetes-dashboard create token admin-user
+
+kubectl proxy
+
+http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+
+
+kubectl explain replicaset
+
+GROUP:      apps
+KIND:       ReplicaSet
+VERSION:    v1
+
+DESCRIPTION:
+    ReplicaSet ensures that a specified number of pod replicas are running at
+    any given time.
+
+FIELDS:
+  apiVersion    <string>
+    APIVersion defines the versioned schema of this representation of an object.
+    Servers should convert recognized schemas to the latest internal value, and
+    may reject unrecognized values. More info:
+    https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+
+  kind  <string>
+    Kind is a string value representing the REST resource this object
+    represents. Servers may infer this from the endpoint the client submits
+    requests to. Cannot be updated. In CamelCase. More info:
+    https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+
+  metadata      <ObjectMeta>
+    If the Labels of a ReplicaSet are empty, they are defaulted to be the same
+    as the Pod(s) that the ReplicaSet manages. Standard object's metadata. More
+    info:
+    https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+
+  spec  <ReplicaSetSpec>
+    Spec defines the specification of the desired behavior of the ReplicaSet.
+    More info:
+    https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+
+  status        <ReplicaSetStatus>
+    Status is the most recently observed status of the ReplicaSet. This data may
+    be out of date by some window of time. Populated by the system. Read-only.
+    More info:
+    https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+
+
+
+kubectl explain pods
+KIND:       Pod
+VERSION:    v1
+
+DESCRIPTION:
+    Pod is a collection of containers that can run on a host. This resource is
+    created by clients and scheduled onto hosts.
+
+FIELDS:
+  apiVersion    <string>
+    APIVersion defines the versioned schema of this representation of an object.
+    Servers should convert recognized schemas to the latest internal value, and
+    may reject unrecognized values. More info:
+    https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+
+  kind  <string>
+    Kind is a string value representing the REST resource this object
+    represents. Servers may infer this from the endpoint the client submits
+    requests to. Cannot be updated. In CamelCase. More info:
+    https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+
+  metadata      <ObjectMeta>
+    Standard object's metadata. More info:
+    https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+
+  spec  <PodSpec>
+    Specification of the desired behavior of the pod. More info:
+    https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+
+  status        <PodStatus>
+    Most recently observed status of the pod. This data may not be up to date.
+    Populated by the system. Read-only. More info:
+    https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status

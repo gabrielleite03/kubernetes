@@ -1,0 +1,4 @@
+br\com\erudio\HelloKubernetesController.class
+br\com\erudio\environment\InstanceInformationService.class
+br\com\erudio\HelloKubernetes.class
+br\com\erudio\Startup.class
